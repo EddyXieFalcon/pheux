@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Config>
+    <ActiveAccount>MeiYaEr</ActiveAccount>
+    <Accounts>
+        <Account id="MeiYaEr">
+            <MarketAddress>tcp://27.17.62.149:40213</MarketAddress>
+            <TraderAddress>tcp://27.17.62.149:40205</TraderAddress>
+            <Broker>1035</Broker>
+            <Investor>00000033</Investor>
+            <Password>123456</Password>
+        </Account>
+        <Account id="ZhongZheng">
+            <MarketAddress>tcp://ctpmn1-front1.citicsf.com:51213</MarketAddress>
+            <TraderAddress>tcp://ctpmn1-front1.citicsf.com:51205</TraderAddress>
+            <Broker>1017</Broker>
+            <Investor>00000060</Investor>
+            <Password>123456</Password>
+        </Account>
+    </Accounts>
+</Config>
