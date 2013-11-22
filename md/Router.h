@@ -11,67 +11,67 @@
 
 namespace Pheux { namespace Core {
 
-	class Router
-	{
-	public:
-		Router()
-		{
-			instruments.push_back("cu1305");
-			instruments.push_back("if9999");
-		}
+    class Router
+    {
+    public:
+        Router()
+        {
+            instruments.push_back("cu1305");
+            instruments.push_back("if9999");
+        }
 
-		void RegisterExecutor(Executor* executor)
-		{
-			if (executor == NULL)
-				return;
+        void RegisterExecutor(Executor* executor)
+        {
+            if (executor == NULL)
+                return;
 
-			executors.insert(executor);
-			executor->LoadStrategy();
-			executor->Init();
+            executors.insert(executor);
+            executor->LoadStrategy();
+            executor->Init();
 
-			agent.TickEvent += Poco::delegate(&(*executor), &Executor::Run);
-			exchange.TickEvent += Poco::delegate(&(*executor), &Executor::Run);
-		}
+            agent.TickEvent += Poco::delegate(&(*executor), &Executor::Run);
+            exchange.TickEvent += Poco::delegate(&(*executor), &Executor::Run);
+        }
 
-		void DeregisterExecutor(Executor* executor)
-		{
-			if (executors.find(executor) != executors.end())
-			{
-				executors.erase(executor);
-				executor->Exit();
+        void DeregisterExecutor(Executor* executor)
+        {
+            if (executors.find(executor) != executors.end())
+            {
+                executors.erase(executor);
+                executor->Exit();
 
-				agent.TickEvent -= Poco::delegate(&(*executor), &Executor::Run);
-				exchange.TickEvent -= Poco::delegate(&(*executor), &Executor::Run);
-			}
-		}
+                agent.TickEvent -= Poco::delegate(&(*executor), &Executor::Run);
+                exchange.TickEvent -= Poco::delegate(&(*executor), &Executor::Run);
+            }
+        }
 
-		void RealTimeRun()
-		{
-			agent.Init(instruments);
+        void RealTimeRun()
+        {
+            agent.Init(instruments);
 
-			std::unique_ptr<Serializer> ser = std::unique_ptr<Serializer>(new TextSerializer("./"));
-			agent.TickEvent += Poco::delegate(&(*ser), &Serializer::Serialize);
+            std::unique_ptr<Serializer> ser = std::unique_ptr<Serializer>(new TextSerializer("./"));
+            agent.TickEvent += Poco::delegate(&(*ser), &Serializer::Serialize);
 
-			agent.Join();
-			agent.Release();
-		}
+            agent.Join();
+            agent.Release();
+        }
 
-		void RealTimeMock()
-		{
-			std::unique_ptr<Serializer> ser = std::unique_ptr<Serializer>(new TextSerializer("./"));
-			// TODO: need to let exchange to populate different instruments
-			// in the different threads
-			exchange.TickEvent += Poco::delegate(&(*ser), &Serializer::Serialize);
-			exchange.Run();
-		}
+        void RealTimeMock()
+        {
+            std::unique_ptr<Serializer> ser = std::unique_ptr<Serializer>(new TextSerializer("./"));
+            // TODO: need to let exchange to populate different instruments
+            // in the different threads
+            exchange.TickEvent += Poco::delegate(&(*ser), &Serializer::Serialize);
+            exchange.Run();
+        }
 
-	private:
-		set<Executor*> executors;
-		vector<string> instruments;
+    private:
+        set<Executor*> executors;
+        vector<string> instruments;
 
-		MdAgent agent;
-		Mock::Exchange exchange;
-	};
+        MdAgent agent;
+        Mock::Exchange exchange;
+    };
 
 }}
 

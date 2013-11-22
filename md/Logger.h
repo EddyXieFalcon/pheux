@@ -6,11 +6,11 @@
 
 namespace Pheux { namespace Core {
 
-	extern Poco::Logger* logger;
-	extern Poco::Logger* console;
+    extern Poco::Logger* logger;
+    extern Poco::Logger* console;
 
-	Poco::Logger* CreateFileLogger(const std::string& file, const std::string& name);
-	Poco::Logger* CreateConsoleLogger(const std::string& name);
+    Poco::Logger* CreateFileLogger(const std::string& file, const std::string& name);
+    Poco::Logger* CreateConsoleLogger(const std::string& name);
 }}
 
 #endif

@@ -18,41 +18,41 @@
 
 namespace Pheux { namespace Mock {
 
-	using namespace Pheux::Core;
+    using namespace Pheux::Core;
 
-	class Exchange
-	{
-	public:
-		Exchange();
-		~Exchange() {}
+    class Exchange
+    {
+    public:
+        Exchange();
+        ~Exchange() {}
 
-		Poco::BasicEvent<Tick*> TickEvent;
+        Poco::BasicEvent<Tick*> TickEvent;
 
-		void GenMarketData();
+        void GenMarketData();
 
-		void Run();
+        void Run();
 
-		void OnRspQryTradingAccount(Account* account);
+        void OnRspQryTradingAccount(Account* account);
 
-		void OnRspQryInvestorPosition(const string& inst, Position* position);
+        void OnRspQryInvestorPosition(const string& inst, Position* position);
 
-		void OnRspOrderInsert(Order* order);
+        void OnRspOrderInsert(Order* order);
 
-		void GenHistoricalData(Serializer* ser);
+        void GenHistoricalData(Serializer* ser);
 
-	private:
-		CThostFtdcDepthMarketDataField* tick;
-		
-		set<string> instruments;
-		set<Tick*> protos;
+    private:
+        CThostFtdcDepthMarketDataField* tick;
 
-		CThostFtdcDepthMarketDataField* GenTick();
+        set<string> instruments;
+        set<Tick*> protos;
 
-		Tick* GenRandomTick(Tick* proto);
+        CThostFtdcDepthMarketDataField* GenTick();
 
-		// only for one user
-		OrderManager om;
-	};
+        Tick* GenRandomTick(Tick* proto);
+
+        // only for one user
+        OrderManager om;
+    };
 }}
 
 #endif

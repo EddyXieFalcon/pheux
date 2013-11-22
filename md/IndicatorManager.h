@@ -6,32 +6,32 @@
 
 namespace Pheux { namespace Core {
 
-	class IndicatorManager
-	{
-	public:
-		IndicatorManager(string inst) : InstrumentID(inst) {}
-		~IndicatorManager() {}
+    class IndicatorManager
+    {
+    public:
+        IndicatorManager(string inst) : InstrumentID(inst) {}
+        ~IndicatorManager() {}
 
-		string InstrumentID;
+        string InstrumentID;
 
-		void Calculate(Tick* tick)
-		{
-			map<string, Indicator*>::iterator it;
-			for (it = indicators.begin(); it != indicators.end(); it++)
-			{
-				it->second->Calculate();
-			}
-		}
+        void Calculate(Tick* tick)
+        {
+            map<string, Indicator*>::iterator it;
+            for (it = indicators.begin(); it != indicators.end(); it++)
+            {
+                it->second->Calculate();
+            }
+        }
 
-		Indicator* RegisterIndicator(Indicator* indicator)
-		{
-			indicators[indicator->HashKey()] = indicator;
-			return indicator;
-		}
+        Indicator* RegisterIndicator(Indicator* indicator)
+        {
+            indicators[indicator->HashKey()] = indicator;
+            return indicator;
+        }
 
-	private:
-		map<string, Indicator*> indicators;
-	};
+    private:
+        map<string, Indicator*> indicators;
+    };
 
 }}
 

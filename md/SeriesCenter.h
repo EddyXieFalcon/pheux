@@ -6,33 +6,33 @@
 
 namespace Pheux { namespace Core {
 
-	class SeriesCenter
-	{
-	public:
-		SeriesCenter() {}
-		~SeriesCenter() {}
+    class SeriesCenter
+    {
+    public:
+        SeriesCenter() {}
+        ~SeriesCenter() {}
 
-		BarSeries* RegisterCustomSeries(string inst, int period, Bar::BarType type, int length)
-		{
-			SeriesManager* manager = GetSeriesManager(inst);
-			if (manager == NULL)
-			{
-				manager = new SeriesManager(inst);
-				series[inst] = manager;
-			}
-			return manager->RegisterCustomSeries(period, type, length);
-		}
+        BarSeries* RegisterCustomSeries(string inst, int period, Bar::BarType type, int length)
+        {
+            SeriesManager* manager = GetSeriesManager(inst);
+            if (manager == NULL)
+            {
+                manager = new SeriesManager(inst);
+                series[inst] = manager;
+            }
+            return manager->RegisterCustomSeries(period, type, length);
+        }
 
-		SeriesManager* GetSeriesManager(string inst)
-		{
-			store_it = series.find(inst);
-			return (store_it != series.end()) ? store_it->second : NULL;
-		}
+        SeriesManager* GetSeriesManager(string inst)
+        {
+            store_it = series.find(inst);
+            return (store_it != series.end()) ? store_it->second : NULL;
+        }
 
-	private:
-		map<string, SeriesManager*>::iterator store_it;
-		map<string, SeriesManager*> series;
-	};
+    private:
+        map<string, SeriesManager*>::iterator store_it;
+        map<string, SeriesManager*> series;
+    };
 
 }}
 

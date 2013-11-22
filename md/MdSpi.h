@@ -6,38 +6,38 @@
 
 namespace Pheux { namespace Core {
 
-	class MdApi;
-	class MdAgent;
+    class MdApi;
+    class MdAgent;
 
-	class MdSpi : public CThostFtdcMdSpi
-	{
-	public:
-		MdSpi(MdAgent*);
-		~MdSpi() {}
+    class MdSpi : public CThostFtdcMdSpi
+    {
+    public:
+        MdSpi(MdAgent*);
+        ~MdSpi() {}
 
-	public:
-		virtual void OnFrontConnected();
+    public:
+        virtual void OnFrontConnected();
 
-		virtual void OnFrontDisconnected(int);
- 
-		virtual void OnHeartBeatWarning(int);
+        virtual void OnFrontDisconnected(int);
 
-		virtual void OnRspUserLogin(CThostFtdcRspUserLoginField*,	CThostFtdcRspInfoField*, int, bool);
+        virtual void OnHeartBeatWarning(int);
 
-		virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField*, CThostFtdcRspInfoField*, int, bool);
+        virtual void OnRspUserLogin(CThostFtdcRspUserLoginField*, CThostFtdcRspInfoField*, int, bool);
 
-		virtual void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField*, CThostFtdcRspInfoField*, int, bool);
+        virtual void OnRspSubMarketData(CThostFtdcSpecificInstrumentField*, CThostFtdcRspInfoField*, int, bool);
 
-		virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField*);
+        virtual void OnRspUnSubMarketData(CThostFtdcSpecificInstrumentField*, CThostFtdcRspInfoField*, int, bool);
 
-		virtual void OnRspError(CThostFtdcRspInfoField*, int, bool);
+        virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField*);
 
-	private:
-		MdAgent* agent;
-		MdApi* api;
+        virtual void OnRspError(CThostFtdcRspInfoField*, int, bool);
 
-		bool IsErrorRspInfo(CThostFtdcRspInfoField*);
-	};
+    private:
+        MdAgent* agent;
+        MdApi* api;
+
+        bool IsErrorRspInfo(CThostFtdcRspInfoField*);
+    };
 
 }}
 

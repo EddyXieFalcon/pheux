@@ -6,65 +6,65 @@
 
 namespace Pheux { namespace Core {
 
-	// CThostFtdcInvestorPositionField
-	class Position
-	{
-	public:
-		// TFtdcHedgeFlagType
-		enum HedgeFlag
-		{
-			Speculation = 49,
-			Arbitrage = 50,
-			Hedge = 51,
-		};
+    // CThostFtdcInvestorPositionField
+    class Position
+    {
+    public:
+        // TFtdcHedgeFlagType
+        enum HedgeFlag
+        {
+            Speculation = 49,
+            Arbitrage = 50,
+            Hedge = 51,
+        };
 
-		// TFtdcPosiDirectionType
-		enum PositionDirection
-		{
-			Net = 49,	// '1'
-			Long = 50,	// '2'
-			Short = 51,	// '3'
-		};
+        // TFtdcPosiDirectionType
+        enum PositionDirection
+        {
+            Net = 49,    // '1'
+            Long = 50,    // '2'
+            Short = 51,    // '3'
+        };
 
-		// TFtdcPositionDateType
-		enum PositionDate
-		{
-			Today = 49,
-			History = 50,
-		};
+        // TFtdcPositionDateType
+        enum PositionDate
+        {
+            Today = 49,
+            History = 50,
+        };
 
-	public:
-		std::string broker;
-		std::string investor;
-		std::string instrument;
-		double close_profit;
-		double position_cost;
-		double position_profit;
-		//double price;
-		double settlement_price;
-		double user_margin;
-		int comb_position;
-		int today_position;
-		int yesterday_position;
-		int volume;
-		HedgeFlag hedge_flag;
-		PositionDirection direction;
-		PositionDate date;
+    public:
+        std::string broker;
+        std::string investor;
+        std::string instrument;
+        double close_profit;
+        double position_cost;
+        double position_profit;
+        //double price;
+        double settlement_price;
+        double user_margin;
+        int comb_position;
+        int today_position;
+        int yesterday_position;
+        int volume;
+        HedgeFlag hedge_flag;
+        PositionDirection direction;
+        PositionDate date;
 
-	public:
-		Position();
+    public:
+        Position();
 
-		Position(const std::string& inst);
+        Position(const std::string& inst);
 
-		Position(CThostFtdcInvestorPositionField* pos);
+        Position(CThostFtdcInvestorPositionField* pos);
 
-		void Update(CThostFtdcInvestorPositionField* pos);
+        void Update(CThostFtdcInvestorPositionField* pos);
 
-		string ToString();
+        string ToString();
 
-	private:
-		void Init();
-	};
+    private:
+        void Init();
+    };
 
 }}
 #endif

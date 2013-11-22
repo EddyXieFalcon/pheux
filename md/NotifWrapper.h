@@ -6,20 +6,20 @@
 
 namespace Pheux { namespace Core {
 
-	template<class T>
-	class NotifWrapper : public Poco::Notification
-	{
-	public:
-		NotifWrapper(const T* t) : _data(t) {}
-		T* data() const { return _data; }
+    template<class T>
+    class NotifWrapper : public Poco::Notification
+    {
+    public:
+        NotifWrapper(const T* t) : _data(t) {}
+        T* data() const { return _data; }
 
-	private:
-		T* _data;
-	};
+    private:
+        T* _data;
+    };
 
-	class TickNotif : public NotifWrapper<Tick>
-	{
-	};
+    class TickNotif : public NotifWrapper<Tick>
+    {
+    };
 
 }}
 

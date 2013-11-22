@@ -4,24 +4,24 @@
 
 namespace Pheux { namespace Core {
 
-	void MdAgent::Init(const vector<string>& insts) 
-	{
-		api = new MdApi(ADDR_MD, BROKER, USER, PASSWORD);
-		spi = new MdSpi(this);
+    void MdAgent::Init(const vector<string>& insts)
+    {
+        api = new MdApi(ADDR_MD, BROKER, USER, PASSWORD);
+        spi = new MdSpi(this);
 
-		api->Init(spi);
+        api->Init(spi);
 
-		for (int i = 0; i < insts.size(); i++)
-			instruments.push_back(insts[i]);
-	}
+        for (int i = 0; i < insts.size(); i++)
+            instruments.push_back(insts[i]);
+    }
 
-	void MdAgent::Join()
-	{
-		api->Join();
-	}
+    void MdAgent::Join()
+    {
+        api->Join();
+    }
 
-	void MdAgent::Release()
-	{
-		api->Release();
-	}
+    void MdAgent::Release()
+    {
+        api->Release();
+    }
 }}

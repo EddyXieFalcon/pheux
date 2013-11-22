@@ -6,34 +6,34 @@
 
 namespace Pheux { namespace Core {
 
-	class Account
-	{
-	public:
-		Account() {}
-		~Account() {}
+    class Account
+    {
+    public:
+        Account() {}
+        ~Account() {}
 
-		Account(CThostFtdcTradingAccountField* info);
+        Account(CThostFtdcTradingAccountField* info);
 
-		void Update(CThostFtdcTradingAccountField* info);
+        void Update(CThostFtdcTradingAccountField* info);
 
-		string HashKey() const;
+        string HashKey() const;
 
-		string ToString();
+        string ToString();
 
-	public:
-		string AccountID;
-		string BrokerID;
-		double Balance;
-		double PreBalance;
-		double Available;
-		double CurrMargin;
-		double PreMargin;
-		double FrozenMargin;
-		double PositionProfit;
-		double Commission;
-		double FrozenCommission;
-		double CloseProfit;
-	};
+    public:
+        string AccountID;
+        string BrokerID;
+        double Balance;
+        double PreBalance;
+        double Available;
+        double CurrMargin;
+        double PreMargin;
+        double FrozenMargin;
+        double PositionProfit;
+        double Commission;
+        double FrozenCommission;
+        double CloseProfit;
+    };
 
 }}
 

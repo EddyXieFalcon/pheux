@@ -22,183 +22,184 @@
 
 namespace Pheux { namespace Core {
 
-	using namespace Pheux::Mock;
+    using namespace Pheux::Mock;
 
-	template<typename T>
-	T RandomWalk(T val)
-	{
-		// global variable to avoid fake random
-		static std::default_random_engine eng;
-		static std::normal_distribution<T> dist(val, val / 10);
-		return dist(eng);
-	}
+    template<typename T>
+    T RandomWalk(T val)
+    {
+        // global variable to avoid fake random
+        static std::default_random_engine eng;
+        static std::normal_distribution<T> dist(val, val / 10);
+        return dist(eng);
+    }
 
-	class Simulator
-	{
-	public:
-		static Simulator* Instance()
-		{
-			if (inst == NULL)
-				inst = new Simulator();
-			return inst;
-		}
+    class Simulator
+    {
+    public:
+        static Simulator* Instance()
+        {
+            if (inst == NULL)
+                inst = new Simulator();
+            return inst;
+        }
 
-		void FunctionalTest()
-		{
-			BarSeries* s5_bars = store["cu1305"]->RegisterCustomSeries(1, Bar::SECOND, 5);
-			TextSerializer ser("./");
-			store["cu1305"]->InitFromHistory();
+        void FunctionalTest()
+        {
+            BarSeries* s5_bars = store["cu1305"]->RegisterCustomSeries(1, Bar::SECOND, 5);
+            TextSerializer ser("./");
+            store["cu1305"]->InitFromHistory();
 
-			Indicator* ma = new MA(s5_bars, 2);
-			indicators["cu1305"]->RegisterIndicator(ma);
+            Indicator* ma = new MA(s5_bars, 2);
+            indicators["cu1305"]->RegisterIndicator(ma);
 
-			int cnt = 0;
-			while(cnt++ != 5)
-				//while(true)
-			{
-				Poco::Thread::sleep(500);
-				CThostFtdcDepthMarketDataField* pData = GenTick();
+            int cnt = 0;
+            while(cnt++ != 5)
+                //while(true)
+            {
+                Poco::Thread::sleep(500);
+                CThostFtdcDepthMarketDataField* pData = GenTick();
 
-				Tick* tick = new Tick(pData);
-				std::map<string, SeriesManager*>::iterator it = store.find(tick->InstrumentID);
-				if (it != store.end())
-				{
-					it->second->Calculate(tick);
-				}
-				cout << tick->ToString();
+                Tick* tick = new Tick(pData);
+                std::map<string, SeriesManager*>::iterator it = store.find(tick->InstrumentID);
+                if (it != store.end())
+                {
+                    it->second->Calculate(tick);
+                }
+                cout << tick->ToString();
 
-				map<string, IndicatorManager*>::iterator it2 = indicators.find(tick->InstrumentID);
-				if (it2 != indicators.end())
-				{
-					it2->second->Calculate(tick);
-				}
-			}
+                map<string, IndicatorManager*>::iterator it2 = indicators.find(tick->InstrumentID);
+                if (it2 != indicators.end())
+                {
+                    it2->second->Calculate(tick);
+                }
+            }
 
-			BarSerializer::Serialize("./", store["cu1305"]->RegistedBars());
-			for (int i = 0; i < ma->Count(); i++)
-			{
-				cout << (*(static_cast<MA*>(ma)))[i] << endl;
-			}
-		}
+            // Unknown Error!
+            //BarSerializer::Serialize("./", store["cu1305"]->RegistedBars());
+            for (int i = 0; i < ma->Count(); i++)
+            {
+                cout << (*(static_cast<MA*>(ma)))[i] << endl;
+            }
+        }
 
-		// real-time simulation
-		void RealTimeMock()
-		{
-			Executor excutor;
-			router.RegisterExecutor(&excutor);
-			router.RealTimeMock();
-		}
+        // real-time simulation
+        void RealTimeMock()
+        {
+            Executor excutor;
+            router.RegisterExecutor(&excutor);
+            router.RealTimeMock();
+        }
 
-		void RealTimeMock2()
-		{
-			excutor.LoadStrategy();
-			excutor.Init();
-			
-			MdAgent agent;
+        void RealTimeMock2()
+        {
+            excutor.LoadStrategy();
+            excutor.Init();
 
-			vector<string> insts;
-			insts.push_back("cu1305");
+            MdAgent agent;
 
-			agent.Init(insts);
-			agent.TickEvent += Poco::delegate(&excutor, &Executor::Run);
-			agent.Join();
-			agent.Release();
+            vector<string> insts;
+            insts.push_back("cu1305");
 
-			excutor.Exit();
-			agent.TickEvent -= Poco::delegate(&excutor, &Executor::Run);
-		}
+            agent.Init(insts);
+            agent.TickEvent += Poco::delegate(&excutor, &Executor::Run);
+            agent.Join();
+            agent.Release();
 
-		// for back-testing
-		void BackTesting()
-		{
-			// 1, prepare the strategies information
-			excutor.LoadStrategy();
-			excutor.Init();
+            excutor.Exit();
+            agent.TickEvent -= Poco::delegate(&excutor, &Executor::Run);
+        }
 
-			// 2, load the historical data
-			string inst = "cu1305";
-			SeriesManager* sm = new SeriesManager(inst);
-			sm->InitFromHistory();
+        // for back-testing
+        void BackTesting()
+        {
+            // 1, prepare the strategies information
+            excutor.LoadStrategy();
+            excutor.Init();
 
-			// 3, use ticks to trigger back-testing
-			// TODO: we can use other period time series(S1,M1..) to trigger the testing, not only for tick
-			//       so it is better to wrap an event instead of the tick!
-			BarSeries* ticks = sm->TickBars;
-			if (ticks == NULL || ticks->size() == 0)
-			{
-				cout << "Can not load the tick data. Exit." << endl;
-				return;
-			}
-			
-			// we should clone one copy, that is in the runtime, system will use the tick to create a new tickbar
-			// so if we use the same pointer, it will lead to infinite loop.
-			//BarSeries* ticks = protos->Clone();
-			for (int i = 0; i < ticks->size(); i++)
-			{
-				TickBar* bar = static_cast<TickBar*>((*ticks)[i]);
-				excutor.Run(bar->GenTick(inst));
-			}
+            // 2, load the historical data
+            string inst = "cu1305";
+            SeriesManager* sm = new SeriesManager(inst);
+            sm->InitFromHistory();
 
-			excutor.Exit();
-		}
+            // 3, use ticks to trigger back-testing
+            // TODO: we can use other period time series(S1,M1..) to trigger the testing, not only for tick
+            //       so it is better to wrap an event instead of the tick!
+            BarSeries* ticks = sm->TickBars;
+            if (ticks == NULL || ticks->size() == 0)
+            {
+                cout << "Can not load the tick data. Exit." << endl;
+                return;
+            }
+            
+            // we should clone one copy, that is in the runtime, system will use the tick to create a new tickbar
+            // so if we use the same pointer, it will lead to infinite loop.
+            //BarSeries* ticks = protos->Clone();
+            for (int i = 0; i < ticks->size(); i++)
+            {
+                TickBar* bar = static_cast<TickBar*>((*ticks)[i]);
+                excutor.Run(bar->GenTick(inst));
+            }
 
-		void BackTesting2()
-		{
-			excutor.LoadStrategy();
-			excutor.Init();
+            excutor.Exit();
+        }
 
-			Serializer* ser = new TextSerializer("./");
+        void BackTesting2()
+        {
+            excutor.LoadStrategy();
+            excutor.Init();
 
-			exchange.TickEvent += Poco::delegate(&excutor, &Executor::SerialRun);
-			exchange.GenHistoricalData(ser);
+            Serializer* ser = new TextSerializer("./");
 
-			excutor.Exit();
-		}
+            exchange.TickEvent += Poco::delegate(&excutor, &Executor::SerialRun);
+            exchange.GenHistoricalData(ser);
 
-	private:
-		Simulator() 
-		{
-			DateTime now;
-			tick = new CThostFtdcDepthMarketDataField();
+            excutor.Exit();
+        }
 
-			strcpy(tick->InstrumentID, "cu1305");
-			tick->LastPrice = 48830.0;
-			tick->Volume = 200;
+    private:
+        Simulator()
+        {
+            Poco::DateTime now;
+            tick = new CThostFtdcDepthMarketDataField();
 
-			store["cu1305"] = new SeriesManager("cu1305");
-			indicators["cu1305"] = new IndicatorManager("cu1305");
+            strcpy(tick->InstrumentID, "cu1305");
+            tick->LastPrice = 48830.0;
+            tick->Volume = 200;
 
-			strategies.push_back(new DoubleMAStrategy());
-		}
-		~Simulator() {}
+            store["cu1305"] = new SeriesManager("cu1305");
+            indicators["cu1305"] = new IndicatorManager("cu1305");
 
-		static Simulator* inst;
+            strategies.push_back(new DoubleMAStrategy());
+        }
+        ~Simulator() {}
 
-	private:
-		CThostFtdcDepthMarketDataField* tick;
-		std::map<string, SeriesManager*> store;
-		std::map<string, IndicatorManager*> indicators;
-		vector<Strategy*> strategies;
-		Executor excutor;
-		Exchange exchange;
-		Router router;
+        static Simulator* inst;
 
-		CThostFtdcDepthMarketDataField* GenTick()
-		{
-			DateTime now;
-			string date = Poco::format("%02d%02d%02d", now.year(), now.month(), now.day());
-			string time = Poco::format("%02d:%02d:%02d", now.hour(), now.minute(), now.second());
+    private:
+        CThostFtdcDepthMarketDataField* tick;
+        std::map<string, SeriesManager*> store;
+        std::map<string, IndicatorManager*> indicators;
+        vector<Strategy*> strategies;
+        Executor excutor;
+        Exchange exchange;
+        Router router;
 
-			strcpy(tick->TradingDay, date.c_str());
-			strcpy(tick->UpdateTime, time.c_str());
-			tick->UpdateMillisec = now.millisecond();
-			tick->LastPrice = RandomWalk(tick->LastPrice);
-			tick->Volume = tick->Volume;
-			return tick;
-		}
-	};
+        CThostFtdcDepthMarketDataField* GenTick()
+        {
+            Poco::DateTime now;
+            string date = Poco::format("%02d%02d%02d", now.year(), now.month(), now.day());
+            string time = Poco::format("%02d:%02d:%02d", now.hour(), now.minute(), now.second());
 
-	Simulator* Simulator::inst = NULL;
+            strcpy(tick->TradingDay, date.c_str());
+            strcpy(tick->UpdateTime, time.c_str());
+            tick->UpdateMillisec = now.millisecond();
+            tick->LastPrice = RandomWalk(tick->LastPrice);
+            tick->Volume = tick->Volume;
+            return tick;
+        }
+    };
+
+    Simulator* Simulator::inst = NULL;
 
 }}
 

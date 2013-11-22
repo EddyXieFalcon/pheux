@@ -6,33 +6,33 @@
 
 namespace Pheux { namespace Core {
 
-	class MdApi
-	{
-	public:
-		MdApi() {}
-		~MdApi() {}
+    class MdApi
+    {
+    public:
+        MdApi() {}
+        ~MdApi() {}
 
-		MdApi(const string& addr, const string& broker, const string& user, const string& passwd, const string& path = "");
+        MdApi(const string& addr, const string& broker, const string& user, const string& passwd, const string& path = "");
 
-		void Init(CThostFtdcMdSpi* spi);
-		void Join();
-		void Release();
+        void Init(CThostFtdcMdSpi* spi);
+        void Join();
+        void Release();
 
-		bool ReqUserLogin();
+        bool ReqUserLogin();
 
-		bool SubscribeMarketData(const vector<string>& insts);
+        bool SubscribeMarketData(const vector<string>& insts);
 
-	private:
-		CThostFtdcMdApi* proxy;
-		int request_id;
+    private:
+        CThostFtdcMdApi* proxy;
+        int request_id;
 
-		char* address;
-		char* broker_id;
-		char* user_id;
-		char* password;
+        char* address;
+        char* broker_id;
+        char* user_id;
+        char* password;
 
-		vector<string> instruments;
-	};
+        vector<string> instruments;
+    };
 
 }}
 

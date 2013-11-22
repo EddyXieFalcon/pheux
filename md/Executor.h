@@ -14,211 +14,212 @@
 
 namespace Pheux { namespace Core {
 
-	class Executor : public Poco::Runnable
-	{
-	public:
-		enum QueueSchedule
-		{
-			AVERAGE,
-			FIFO,
-			LIFO,
-		};
-		 
-	public:
-		Executor() 
-			: queue_schedule(AVERAGE), tick(NULL), finish(true)
-		{
-			trader.Init();
-		}
+    class Executor : public Poco::Runnable
+    {
+    public:
+        enum QueueSchedule
+        {
+            AVERAGE,
+            FIFO,
+            LIFO,
+        };
 
-		void LoadStrategy()
-		{
-			strategies.push_back(new DoubleMAStrategy());
-		}
+    public:
+        Executor()
+            : queue_schedule(AVERAGE), tick(NULL), finish(true)
+        {
+            trader.Init();
+        }
 
-		void Init()
-		{
-			for (int i = 0; i < strategies.size(); i++)
-			{
-				strategies[i]->exector = this;
-				strategies[i]->Init();
-			}
-		}
+        void LoadStrategy()
+        {
+            strategies.push_back(new DoubleMAStrategy());
+        }
 
-		void Run(Tick* tick)
-		{
-			if (tick == NULL || instruments.find(tick->InstrumentID) == instruments.end())
-				return;
+        void Init()
+        {
+            for (int i = 0; i < strategies.size(); i++)
+            {
+                strategies[i]->exector = this;
+                strategies[i]->Init();
+            }
+        }
 
-			if (!finish)
-			{
-				queue.push(tick);
-				return;
-			}
-			this->tick = schedule(tick);
-			Poco::ThreadPool::defaultPool().start(*this);
-			//Poco::ThreadPool::defaultPool().joinAll();
-		}
+        void Run(Tick* tick)
+        {
+            if (tick == NULL || instruments.find(tick->InstrumentID) == instruments.end())
+                return;
 
-		void Run(const void* sender, Tick*& arg)
-		{
-			Tick* tick = arg;
-			Run(tick);
-		}
+            if (!finish)
+            {
+                queue.push(tick);
+                return;
+            }
+            this->tick = schedule(tick);
+            Poco::ThreadPool::defaultPool().start(*this);
+            //Poco::ThreadPool::defaultPool().joinAll();
+        }
 
-		void SerialRun(Tick* tick)
-		{
-			this->tick = tick;
-			run();
-		}
+        void Run(const void* sender, Tick*& arg)
+        {
+            Tick* tick = arg;
+            Run(tick);
+        }
 
-		void SerialRun(const void* sender, Tick*& arg)
-		{
-			Tick* tick = arg;
-			SerialRun(tick);
-		}
+        void SerialRun(Tick* tick)
+        {
+            this->tick = tick;
+            run();
+        }
 
-		void Exit()
-		{
-			for (int i = 0; i < strategies.size(); i++)
-			{
-				strategies[i]->Exit();
-			}
-		}
+        void SerialRun(const void* sender, Tick*& arg)
+        {
+            Tick* tick = arg;
+            SerialRun(tick);
+        }
 
-		BarSeries* RegisterCustomSeries(string inst, int period, Bar::BarType type, int length)
-		{
-			instruments.insert(inst);
+        void Exit()
+        {
+            for (int i = 0; i < strategies.size(); i++)
+            {
+                strategies[i]->Exit();
+            }
+        }
 
-			SeriesManager* manager = GetSeriesManager(inst);
-			if (manager == NULL)
-			{
-				manager = new SeriesManager(inst);
-				series[inst] = manager;
-			}
-			return manager->RegisterCustomSeries(period, type, length);
-		}
+        BarSeries* RegisterCustomSeries(string inst, int period, Bar::BarType type, int length)
+        {
+            instruments.insert(inst);
 
-		SeriesManager* GetSeriesManager(string inst)
-		{
-			series_it = series.find(inst);
-			return (series_it != series.end()) ? series_it->second : NULL;
-		}
+            SeriesManager* manager = GetSeriesManager(inst);
+            if (manager == NULL)
+            {
+                manager = new SeriesManager(inst);
+                series[inst] = manager;
+            }
+            return manager->RegisterCustomSeries(period, type, length);
+        }
 
-		Indicator* RegisterIndicator(string inst, Indicator* indicator)
-		{
-			if (instruments.find(inst) == instruments.end())
-			{
-				string msg = inst + ": is not found in the bar series.";
-				throw new std::exception(msg.c_str());
-			}
+        SeriesManager* GetSeriesManager(string inst)
+        {
+            series_it = series.find(inst);
+            return (series_it != series.end()) ? series_it->second : NULL;
+        }
 
-			IndicatorManager* manager = GetIndicatorManager(inst);
-			if (manager == NULL)
-			{
-				manager = new IndicatorManager(inst);
-				indicators[inst] = manager;
-			}
-			return manager->RegisterIndicator(indicator);
-		}
+        Indicator* RegisterIndicator(string inst, Indicator* indicator)
+        {
+            if (instruments.find(inst) == instruments.end())
+            {
+                string msg = inst + ": is not found in the bar series.";
+                //throw new std::exception(msg.c_str());
+                throw msg;
+            }
 
-		IndicatorManager* GetIndicatorManager(string inst)
-		{
-			ind_it = indicators.find(inst);
-			return (ind_it != indicators.end()) ? ind_it->second : NULL;
-		}
+            IndicatorManager* manager = GetIndicatorManager(inst);
+            if (manager == NULL)
+            {
+                manager = new IndicatorManager(inst);
+                indicators[inst] = manager;
+            }
+            return manager->RegisterIndicator(indicator);
+        }
 
-		TraderAgent* Trader() { return &trader; }
+        IndicatorManager* GetIndicatorManager(string inst)
+        {
+            ind_it = indicators.find(inst);
+            return (ind_it != indicators.end()) ? ind_it->second : NULL;
+        }
 
-		Tick* CurTick() { return tick; }
+        TraderAgent* Trader() { return &trader; }
 
-		bool IsFinish() const { return finish; }
+        Tick* CurTick() { return tick; }
 
-		set<string> Instruments() const { return instruments; }
+        bool IsFinish() const { return finish; }
 
-	private:
-		vector<Strategy*> strategies;
-		bool finish;
-		Tick* tick;
-		QueueSchedule queue_schedule;
-		set<string> instruments;
-		
-		TraderAgent trader;
+        set<string> Instruments() const { return instruments; }
 
-		map<string, SeriesManager*>::iterator series_it;
-		map<string, SeriesManager*> series;
+    private:
+        vector<Strategy*> strategies;
+        bool finish;
+        Tick* tick;
+        QueueSchedule queue_schedule;
+        set<string> instruments;
 
-		map<string, IndicatorManager*>::iterator ind_it;
-		map<string, IndicatorManager*> indicators;
+        TraderAgent trader;
 
-		// TODO:: actually it will be Bar instead of Tick
-		std::queue<Tick*> queue;
-		Poco::Mutex _mutex;
+        map<string, SeriesManager*>::iterator series_it;
+        map<string, SeriesManager*> series;
 
-		Tick* dequeue()
-		{
-			Tick* res = queue.front();
-			queue.pop();
-			return res;
-		}
+        map<string, IndicatorManager*>::iterator ind_it;
+        map<string, IndicatorManager*> indicators;
 
-		virtual void run()
-		{
-			changeStatus(false);
+        // TODO:: actually it will be Bar instead of Tick
+        std::queue<Tick*> queue;
+        Poco::Mutex _mutex;
 
-			SeriesManager* sm = GetSeriesManager(tick->InstrumentID);
-			if (sm != NULL)
-				sm->Calculate(tick);
+        Tick* dequeue()
+        {
+            Tick* res = queue.front();
+            queue.pop();
+            return res;
+        }
 
-			IndicatorManager* im = GetIndicatorManager(tick->InstrumentID);
-			if (im != NULL)
-				im->Calculate(tick);
+        virtual void run()
+        {
+            changeStatus(false);
 
-			for (int i = 0; i < strategies.size(); i++)
-			{
-				strategies[i]->Run();
-			}
+            SeriesManager* sm = GetSeriesManager(tick->InstrumentID);
+            if (sm != NULL)
+                sm->Calculate(tick);
 
-			//Poco::Thread::sleep(2000);
-			changeStatus(true);
-		}
+            IndicatorManager* im = GetIndicatorManager(tick->InstrumentID);
+            if (im != NULL)
+                im->Calculate(tick);
 
-		Tick* schedule(Tick* tick)
-		{
-			if (queue.empty())
-				return tick;
+            for (int i = 0; i < strategies.size(); i++)
+            {
+                strategies[i]->Run();
+            }
 
-			Tick* res = tick;
-			switch (queue_schedule)
-			{
-			case AVERAGE:
-				{
-					double sum = tick->LastPrice;
-					int size = queue.size();
-					for (int i = 0; i < size; i++)
-					{
-						sum += dequeue()->LastPrice;
-					}
-					res->LastPrice = sum / (size + 1);
-					break;
-				}
-			case FIFO:
-				res = dequeue();
-				break;
-			case LIFO:
-				//res = tick;
-				break;
-			}
-			return res;
-		}
+            //Poco::Thread::sleep(2000);
+            changeStatus(true);
+        }
 
-		void changeStatus(bool status)
-		{
-			_mutex.lock();
-			finish = status;
-			_mutex.unlock();
-		}
-	};
+        Tick* schedule(Tick* tick)
+        {
+            if (queue.empty())
+                return tick;
+
+            Tick* res = tick;
+            switch (queue_schedule)
+            {
+            case AVERAGE:
+                {
+                    double sum = tick->LastPrice;
+                    int size = queue.size();
+                    for (int i = 0; i < size; i++)
+                    {
+                        sum += dequeue()->LastPrice;
+                    }
+                    res->LastPrice = sum / (size + 1);
+                    break;
+                }
+            case FIFO:
+                res = dequeue();
+                break;
+            case LIFO:
+                //res = tick;
+                break;
+            }
+            return res;
+        }
+
+        void changeStatus(bool status)
+        {
+            _mutex.lock();
+            finish = status;
+            _mutex.unlock();
+        }
+    };
 
 }}
 #endif

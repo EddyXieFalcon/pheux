@@ -10,21 +10,21 @@ namespace Pheux { namespace Core {
 class AccountManager
 {
 public:
-	AccountManager() : account(NULL) {}
-	~AccountManager() {}
+    AccountManager() : account(NULL) {}
+    ~AccountManager() {}
 
-	void Update(CThostFtdcTradingAccountField* info)
-	{
-		if (account != NULL)
-			account->Update(info);
-		else
-			account = new Account(info);
-	}
+    void Update(CThostFtdcTradingAccountField* info)
+    {
+        if (account != NULL)
+            account->Update(info);
+        else
+            account = new Account(info);
+    }
 
-	Account* GetAccount() const { return account; }
+    Account* GetAccount() const { return account; }
 
 private:
-	Account* account;
+    Account* account;
 };
 
 }}

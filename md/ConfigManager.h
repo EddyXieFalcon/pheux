@@ -5,17 +5,17 @@
 
 namespace Pheux { namespace Core {
 
-	class ConfigManager
-	{
-	//public:
-	//	vector<string> GetActiveAccount()
-	//	{
-	//		return 
-	//	}
-	//
-	//private:
+    class ConfigManager
+    {
+    //public:
+    //    vector<string> GetActiveAccount()
+    //    {
+    //        return
+    //    }
+    //
+    //private:
 
-	}
+    }
 }}
 
 #endif

@@ -11,42 +11,42 @@
 
 namespace Pheux { namespace Core {
 
-	class TraderApi;
-	class TraderSpi;
-	
-	class TraderAgent
-	{
-	public:
-		friend class TraderApi;
-		friend class TraderSpi;
+    class TraderApi;
+    class TraderSpi;
 
-	public:
-		TraderAgent();
+    class TraderAgent
+    {
+    public:
+        friend class TraderApi;
+        friend class TraderSpi;
 
-		void Init();
+    public:
+        TraderAgent();
 
-		void GetSettlementInfo();
+        void Init();
 
-		Account* GetAccountInfo(bool isCache = true);
+        void GetSettlementInfo();
 
-		Position* GetPositionInfo(const std::string& inst, bool isCache = true);
+        Account* GetAccountInfo(bool isCache = true);
 
-		Order* SendOrder(std::string inst, Order::Direction direc, int volume, double price);
+        Position* GetPositionInfo(const std::string& inst, bool isCache = true);
 
-	private:
-		TraderApi* api;
-		TraderSpi* spi;
+        Order* SendOrder(std::string inst, Order::Direction direc, int volume, double price);
 
-		LoginSession* session;
-		OrderManager om;
+    private:
+        TraderApi* api;
+        TraderSpi* spi;
 
-		//Account* account;
-		//std::map<std::string, Position*> positions;
+        LoginSession* session;
+        OrderManager om;
+
+        //Account* account;
+        //std::map<std::string, Position*> positions;
 
 #ifdef _MOCK_
-		Mock::Exchange* exchange;
+        Mock::Exchange* exchange;
 #endif
-	};
+    };
 
 }}
 #endif

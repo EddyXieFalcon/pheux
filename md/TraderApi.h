@@ -7,37 +7,37 @@
 
 namespace Pheux { namespace Core {
 
-	// TraderApi is a proxy of CThostFtdcTraderApi, instead of the derived class
-	//
-	class TraderApi
-	{
-	public:
-		TraderApi() {}
-		~TraderApi() {}
+    // TraderApi is a proxy of CThostFtdcTraderApi, instead of the derived class
+    //
+    class TraderApi
+    {
+    public:
+        TraderApi() {}
+        ~TraderApi() {}
 
-		TraderApi(const string& addr, const string& broker, const string& user, const string& passwd, const string& path = "");
+        TraderApi(const string& addr, const string& broker, const string& user, const string& passwd, const string& path = "");
 
-		void Init(CThostFtdcTraderSpi* spi);
+        void Init(CThostFtdcTraderSpi* spi);
 
-		bool ReqUserLogin();
+        bool ReqUserLogin();
 
-		bool ReqSettlementInfoConfirm();
+        bool ReqSettlementInfoConfirm();
 
-		bool ReqQryTradingAccount();
+        bool ReqQryTradingAccount();
 
-		bool ReqQryInvestorPosition(const std::string& inst);
+        bool ReqQryInvestorPosition(const std::string& inst);
 
-		bool ReqOrderInsert(const Order* order);
+        bool ReqOrderInsert(const Order* order);
 
-	private:
-		CThostFtdcTraderApi* proxy;
-		int request_id;
+    private:
+        CThostFtdcTraderApi* proxy;
+        int request_id;
 
-		char* address;
-		char* broker_id;
-		char* user_id;
-		char* password;
-	};
+        char* address;
+        char* broker_id;
+        char* user_id;
+        char* password;
+    };
 
 }}
 
